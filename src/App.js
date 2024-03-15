@@ -78,21 +78,23 @@ function App() {
 
     const googleLogin = useGoogleLogin({
         onSuccess: (codeResponse) => {
+
+            console.log(codeResponse)
             // Send the authorization code to the backend server
-            fetch('/api/auth/google', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ code: codeResponse.code }),
-            })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Backend response:', data);
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
+            // fetch('/api/auth/google', {
+            //     method: 'POST',
+            //     headers: {
+            //         'Content-Type': 'application/json',
+            //     },
+            //     body: JSON.stringify({ code: codeResponse.code }),
+            // })
+            //     .then(response => response.json())
+            //     .then(data => {
+            //         console.log('Backend response:', data);
+            //     })
+            //     .catch(error => {
+            //         console.error('Error:', error);
+            //     });
         },
         onError: () => {
             // Handle login errors here

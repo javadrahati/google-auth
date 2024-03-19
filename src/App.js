@@ -1,9 +1,6 @@
-// import logo from './logo.svg';
 // import './App.css';
 // import React from 'react';
-// import ReactDOM from 'react-dom';
-// import GoogleLogin from 'react-google-login';
-// // or
+// import { GoogleLogin } from '@react-oauth/google';
 // function App() {
 //     const  responseGoogle =(e) =>{
 //         console.log(e)
@@ -12,13 +9,12 @@
 //
 //   return (
 //     <div className="App">
-//       <GoogleLogin
-//           clientId="21413704931-8mhv2l6hg9am2er4bj1bncpt0u4mt66d.apps.googleusercontent.com"
-//           buttonText="Login"
-//           onSuccess={responseGoogle}
-//           onFailure={responseGoogle}
-//           cookiePolicy={'single_host_origin'}
-//       />
+//         <GoogleLogin
+//             onSuccess={responseGoogle}
+//             onError={responseGoogle}
+//             useOneTap
+//             flow="auth-code"
+//         />
 //     </div>
 //   );
 // }
@@ -64,12 +60,8 @@
 
 
 
-import logo from './logo.svg';
 import './App.css';
 import React from 'react';
-import ReactDOM from 'react-dom';
-// or
-import { GoogleLogin } from '@react-oauth/google';
 
 import { useGoogleLogin } from '@react-oauth/google';
 
@@ -77,36 +69,46 @@ function App() {
 
 
     const googleLogin = useGoogleLogin({
-        onSuccess: (codeResponse) => {
+        onSuccess: (tokenResponse) => {
+            console.log('Google login successful', tokenResponse);
 
-            console.log(codeResponse)
-            // Send the authorization code to the backend server
-            // fetch('/api/auth/google', {
-            //     method: 'POST',
-            //     headers: {
-            //         'Content-Type': 'application/json',
-            //     },
-            //     body: JSON.stringify({ code: codeResponse.code }),
-            // })
-            //     .then(response => response.json())
-            //     .then(data => {
-            //         console.log('Backend response:', data);
-            //     })
-            //     .catch(error => {
-            //         console.error('Error:', error);
-            //     });
+            const {code} = tokenResponse
+            fetch('https://oauth2.googleapis.com/token', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    code,
+                    // client_id,
+                    // client_secret,
+                    // redirect_uri,
+                    grant_type:"convert_token",
+                }),
+            })
+                .then(response => response.json())
+                .then(tokens => {
+                    // Send the tokens back to the frontend, or store them securely and create a session
+                })
+                .catch(error => {
+                    // Handle errors in the token exchange
+                    console.error('Token exchange error:', error);
+                });
+
+            // You can now use the tokenResponse to authenticate the user in your app
         },
         onError: () => {
-            // Handle login errors here
             console.error('Google login failed');
+            // Handle login errors here
         },
-        flow: 'auth-code',
+        flow: 'auth-code', // Use 'auth-code' for the authorization code flow
     });
 
     return (
         <button onClick={() => googleLogin()}>
-            Sign in with Google
+            Sign in with Google 🚀
         </button>
     );
 }
+
 export default App;
